@@ -12,9 +12,6 @@
     "ios",
     "orientation"
   ],
-  "peerDependencies": {
-    "react-native": "~0.5.0"
-  },
   "author": "Yamill Vallecillo <yamill@gmail.com> (github.com/yamill)",
   "license": "ISC",
   "repository": {
