@@ -15,7 +15,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
   }
   return self;
-  
 }
 
 
@@ -26,7 +25,7 @@
 
 - (void)deviceOrientationDidChange:(NSNotification *)notification
 {
-  
+
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 
   NSString *orientationStr;
@@ -44,7 +43,6 @@
       orientationStr = @"UNKNOWN";
       break;
   }
-  
 
   [_bridge.eventDispatcher sendDeviceEventWithName:@"orientationDidChange"
                                               body:@{@"orientation": orientationStr}];
@@ -57,7 +55,11 @@ RCT_EXPORT_METHOD(lockToPortrait)
   NSLog(@"Locked to Portrait");
   AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
   delegate.orientation = 1;
-  
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSNumber *value = [NSNumber numberWithInt:UIInterfaceOrientationPortrait];
+    [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+  });
 }
 
 RCT_EXPORT_METHOD(lockToLandscape)
@@ -65,7 +67,11 @@ RCT_EXPORT_METHOD(lockToLandscape)
   NSLog(@"Locked to Landscape");
   AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
   delegate.orientation = 2;
-  
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSNumber *value = [NSNumber numberWithInt:UIDeviceOrientationLandscapeLeft];
+    [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
+  });
 }
 
 RCT_EXPORT_METHOD(unlockAllOrientations)
@@ -73,7 +79,6 @@ RCT_EXPORT_METHOD(unlockAllOrientations)
   NSLog(@"Unlock All Orientations");
   AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
   delegate.orientation = 3;
-  
 }
 
 
