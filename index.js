@@ -1,8 +1,11 @@
-var Orientation = require('react-native').NativeModules.Orientation;
-var RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
+'use strict';
 
-var listeners = {};
-var deviceEvent = "orientationDidChange";
+const Orientation = require('react-native').NativeModules.Orientation;
+const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
+
+const listeners = {};
+const deviceEvent = "orientationDidChange";
+let currentCookie = 1;
 
 module.exports = {
   lockToPortrait() {
@@ -15,16 +18,19 @@ module.exports = {
     Orientation.unlockAllOrientations();
   },
   addOrientationListener(cb) {
-    listeners[cb] = RCTDeviceEventEmitter.addListener(deviceEvent,
-      (body) => {
-        cb(body.orientation);
-      });
+    const cookie = currentCookie++;
+    listeners[cookie] = cb;
+    return cookie;
   },
-  removeOrientationListener(cb) {
-    if (!listeners[cb]) {
-      return;
-    }
-    listeners[cb].remove();
-    listeners[cb] = null;
+  removeOrientationListener(cookie) {
+    delete listeners[cookie];
   }
 }
+
+RCTDeviceEventEmitter.addListener(deviceEvent,(body) =>
+{
+  Object.keys(listeners).forEach((key) => {
+    const cb = listeners[key];
+    cb && cb(body.orientation);
+  });
+});
